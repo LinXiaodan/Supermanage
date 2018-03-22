@@ -136,4 +136,3 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
 
-cookies_salt = 'graduation'

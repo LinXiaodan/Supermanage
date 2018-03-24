@@ -30,12 +30,12 @@ class Buy(models.Model):
 class Stock(models.Model):
     goods_id = models.CharField(max_length=10)  # 商品编号
     goods_type = models.CharField(max_length=10)     # 商品种类
-    goods_name = models.CharField(max_length=100)
+    goods_name = models.CharField(max_length=100)   # 商品名称
     unit = models.CharField(max_length=10)   # 商品单位
     quantity = models.IntegerField()    # 库存数量
     buying_price = models.FloatField()  # 进货价
     price = models.FloatField()         # 售价
-    lowest_quantity = models.IntegerField()
+    lowest_quantity = models.IntegerField()     # 最低库存
 
 
 # 商品种类表

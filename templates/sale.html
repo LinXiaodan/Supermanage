@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block headmore %}
+    <script type="text/javascript" language="javascript">
+        var row_count = 0;
+        function addNew()
+        {
+            row_count++;
+            var table1 = $('#table1');
+            var firstTr = table1.find('tbody>tr:first');
+            var row = $("<tr></tr>");
+            var td = $("<td>"+row_count+"</td>");
+            td.append($("<input type='checkbox' name='count' value='New'>"));
+            td.append("<input type='text' name='count'+row_count >") ;
+td.append("<input type='button' value='删除' onclick='delRow(this)'>") ;
+row.append(td);
+table1.append(row);
+}
+function delRow(obj)
+{
+$(obj).parent().remove();
+}
+function del()
+{
+var checked = $("input[type='checkbox'][name='count']:checked");
+$(checked).each(function(){
+$(this).parent().parent().remove();
+});
+}
+</script>
+{% endblock %}
+
+{% block username %}
+{{ username }}
+{% endblock %}
+
+{% block container %}
+    <input type="button" value="添加" onclick="addNew();">
+    <input type="button" value="删除" onclick="del();">
+    <table id="table1" class="table">
+        <tr>
+            <th></th>
+            <th>编号</th>
+            <th>数量</th>
+        </tr>
+        <tr>
+            <td><input type="checkbox" name="count" value="New"></td>
+
+        </tr>
+    </table>
+{% endblock %}

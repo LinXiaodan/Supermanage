@@ -53,3 +53,12 @@ def addGoods(goods_id, goods_type, goods_name, unit, quantity, buying_price, pri
         return 1
     except:
         return 0
+
+
+# 列表返回所有库存信息
+def getStock():
+    res = Stock.objects.all()
+    goods_list = []
+    for var in res:
+        goods_list.append(var)
+    return goods_list

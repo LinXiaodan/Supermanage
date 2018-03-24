@@ -34,15 +34,26 @@ def login(request):
 # 库存
 def stock(request):
     username = request.COOKIES.get('username')
-    user_level = int(request.COOKIES.get('user_level'))
+    user_level = request.COOKIES.get('user_level')
 
-    if user_level == 0 or user_level == 1:
+    if user_level == '0' or user_level == '1':
         context = {
             'username': username
         }
+        stock_list = getStock()
+        if user_level == '0':
+            context.update({
+                'info_list': ['编号', '种类', '名称', '单位', '库存量', '进货价（元）', '售价（元）', '最低库存']
+            })
+            show_list = []
+            for var in stock_list:
+                show_list.append([var.goods_id, var.goods_type, var.goods_name, var.unit, var.quantity,
+                                  var.buying_price, var.price, var.lowest_quantity])
+            context.update({
+                'show_list': show_list
+            })
         return render(request, 'stock.html', context)
     else:
-        print 'user_level', user_level
         return redirect('/login')
 
 
@@ -105,3 +116,15 @@ def add_goods(request):
                 'msg': '商品编号重复！'
             })
         return render(request, 'add_goods.html', ctx)
+
+
+# 销售
+def sale(request):
+    if int(request.COOKIES.get('user_level')) is not 0:     # 非管理员/未登录
+        return redirect('/stock')
+
+    ctx = {
+        'username': request.COOKIES.get('username')
+    }
+
+    return render(request, 'sale.html', ctx)

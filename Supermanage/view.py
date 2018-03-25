@@ -59,6 +59,8 @@ def stock(request):
 
 # 添加商品种类
 def add_type(request):
+    if request.COOKIES.get('user_level') is None:
+        return redirect('/login')
     if int(request.COOKIES.get('user_level')) is not 0:     # 非管理员/未登录
         return redirect('/stock')
 
@@ -80,6 +82,8 @@ def add_type(request):
 
 # 添加商品信息
 def add_goods(request):
+    if request.COOKIES.get('user_level') is None:
+        return redirect('/login')
     if int(request.COOKIES.get('user_level')) is not 0:     # 非管理员/未登录
         return redirect('/stock')
 
@@ -120,6 +124,8 @@ def add_goods(request):
 
 # 销售
 def sale(request):
+    if request.COOKIES.get('user_level') is None:
+        return redirect('/login')
     if int(request.COOKIES.get('user_level')) is not 0:     # 非管理员/未登录
         return redirect('/stock')
 
@@ -127,4 +133,13 @@ def sale(request):
         'username': request.COOKIES.get('username')
     }
 
-    return render(request, 'sale.html', ctx)
+    if request.method == 'GET':
+        return render(request, 'sale.html', ctx)
+    else:
+        print request.body
+        return HttpResponse('销售成功')
+
+
+# 销售单页面
+def sale_list(request):
+    return HttpResponse('销售')

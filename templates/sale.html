@@ -3,31 +3,71 @@
 {% block headmore %}
     <script type="text/javascript" language="javascript">
         var row_count = 0;
-        function addNew()
+        function addNew()   //添加新行
         {
             row_count++;
             var table1 = $('#table1');
-            var firstTr = table1.find('tbody>tr:first');
-            var row = $("<tr></tr>");
-            var td = $("<td>"+row_count+"</td>");
-            td.append($("<input type='checkbox' name='count' value='New'>"));
-            td.append("<input type='text' name='count'+row_count >") ;
-            td.append("<input type='button' value='删除' onclick='delRow(this)'>") ;
-            row.append(td);
-table1.append(row);
-}
-function delRow(obj)
-{
-$(obj).parent().remove();
-}
-function del()
-{
-var checked = $("input[type='checkbox'][name='count']:checked");
-$(checked).each(function(){
-$(this).parent().parent().remove();
-});
-}
-</script>
+            var row = $("<tr class='submitSale'></tr>");
+            row.append("<td><input type='checkbox' name='count' value='New' placeholder=''></td>");
+            row.append("<td><input type='text' name='goods_id' placeholder=''></td>");
+            row.append("<td><input type='number' name='quantity' placeholder=''></td>");
+            row.append("<td><button class='btn btn-primary' type='button' onclick='delRow(this)'>删除</button></td>");
+            table1.append(row);
+        }
+        function delRow(obj)    //删除行
+        {
+            $(obj).parent().parent().remove();
+        }
+        function del()      //删除选中行
+        {
+            var checked = $("input[type='checkbox'][name='count']:checked");
+            $(checked).each(function(){
+                $(this).parent().parent().remove();
+            });
+        }
+        //function isEmpty(obj){
+            //if(typeof obj == "undefined" || obj == null || obj == ""){
+            //return true;
+        //}else{
+            //return false;
+        //}
+        //}
+        function sale() {   //提交销售信息
+            var msg = {};
+            var count = 0;
+            $(".submitSale").each(function () {
+               var id = $(this).find("input[type='text']").val();
+               var quantity = $(this).find("input[type='number']").val();
+               console.log(id);
+               console.log(quantity);
+               msg[count] = {'id': id, 'quantity': quantity};
+               count += 1;
+            });
+            console.log(msg);
+            $.post(
+                '/sale',
+                JSON.stringify(msg),
+                function(data){
+                    console.log(data);
+                    console.log('aaa');
+                    location.href = '/sale_list';
+                    //$('#result').html(data);
+                },
+                "json"
+            );
+            //$.ajax({
+                //type: 'post',
+                //url: '/sale',
+                //async: false,
+                //data: JSON.stringify(msg),
+                //contentType: "application/json; charset=utf-8",
+                //dataType: "json",
+                //success: function(data){
+                    //location.href = '/sale_list';
+                //}
+            //})
+        }
+    </script>
 {% endblock %}
 
 {% block username %}
@@ -35,17 +75,26 @@ $(this).parent().parent().remove();
 {% endblock %}
 
 {% block container %}
-    <input type="button" value="添加" onclick="addNew();">
-    <input type="button" value="删除" onclick="del();">
-    <table id="table1" class="table">
-        <tr>
-            <th></th>
-            <th>编号</th>
-            <th>数量</th>
-        </tr>
-        <tr>
-            <td><input type="checkbox" name="count" value="New"></td>
-
-        </tr>
-    </table>
+    <div class="container" style="width: 600px;">
+        <h2>销售</h2>
+        <input class="btn btn-primary" type="button" value="添加" onclick="addNew();">
+        <input class="btn btn-primary" type="button" value="删除" onclick="del();">
+        <form id="submitForm">
+            <table id="table1" class="table">
+            <tr>
+                <th></th>
+                <th>编号</th>
+                <th>数量</th>
+            </tr>
+            <tr class="submitSale">
+                <td><input type="checkbox" name="count" value="New" placeholder=""></td>
+                <td><input type="text" name="goods_id" placeholder=""></td>
+                <td><input type="number" name="quantity" placeholder=""></td>
+                <td><button class="btn btn-primary" type="button" onclick="delRow(this)">删除</button></td>
+            </tr>
+        </table>
+        </form>
+    <button class="btn btn-primary" type="button" onclick="sale();">销售</button>
+    <div id="result">result</div>
+    </div>
 {% endblock %}

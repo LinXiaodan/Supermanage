@@ -25,5 +25,6 @@ urlpatterns = [
     url(r'stock', view.stock),
     url(r'add_type', view.add_type),
     url(r'add_goods', view.add_goods),
-    url(r'sale', view.sale)
+    url(r'sale', view.sale),
+    url(r'sale_list', view.sale_list)
 ]

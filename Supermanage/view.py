@@ -10,6 +10,8 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .model import *
+import json
+import time
 
 
 # 登录
@@ -61,7 +63,7 @@ def stock(request):
 def add_type(request):
     if request.COOKIES.get('user_level') is None:
         return redirect('/login')
-    if int(request.COOKIES.get('user_level')) is not 0:     # 非管理员/未登录
+    if int(request.COOKIES.get('user_level')) is not 0:     # 非管理员
         return redirect('/stock')
 
     ctx = {
@@ -84,7 +86,7 @@ def add_type(request):
 def add_goods(request):
     if request.COOKIES.get('user_level') is None:
         return redirect('/login')
-    if int(request.COOKIES.get('user_level')) is not 0:     # 非管理员/未登录
+    if int(request.COOKIES.get('user_level')) is not 0:     # 非管理员
         return redirect('/stock')
 
     ctx = {
@@ -124,22 +126,28 @@ def add_goods(request):
 
 # 销售
 def sale(request):
-    if request.COOKIES.get('user_level') is None:
+    if request.COOKIES.get('user_level') is None:   # 未登录
         return redirect('/login')
-    if int(request.COOKIES.get('user_level')) is not 0:     # 非管理员/未登录
-        return redirect('/stock')
 
+    username = request.COOKIES.get('username')
     ctx = {
-        'username': request.COOKIES.get('username')
+        'username': username
     }
 
     if request.method == 'GET':
         return render(request, 'sale.html', ctx)
     else:
-        print request.body
-        return HttpResponse('销售成功')
+        now_time = str(int(time.time()))
+        sale_result = reduce_stock(json.loads(request.body), username, now_time, request.COOKIES.get('user_level'))
+        print sale_result
+        if sale_result.get('status') == 'success':
+            return HttpResponse(json.dumps(sale_result))
+        else:
+            return HttpResponse('失败，请重试！')
 
 
 # 销售单页面
 def sale_list(request):
+    list_info = json.loads(request.COOKIES.get('list_info'))
+    print list_info
     return HttpResponse('销售')

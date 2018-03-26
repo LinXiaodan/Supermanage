@@ -25,47 +25,29 @@
                 $(this).parent().parent().remove();
             });
         }
-        //function isEmpty(obj){
-            //if(typeof obj == "undefined" || obj == null || obj == ""){
-            //return true;
-        //}else{
-            //return false;
-        //}
-        //}
+
         function sale() {   //提交销售信息
             var msg = {};
             var count = 0;
             $(".submitSale").each(function () {
                var id = $(this).find("input[type='text']").val();
                var quantity = $(this).find("input[type='number']").val();
-               console.log(id);
-               console.log(quantity);
                msg[count] = {'id': id, 'quantity': quantity};
                count += 1;
             });
-            console.log(msg);
             $.post(
                 '/sale',
                 JSON.stringify(msg),
                 function(data){
-                    console.log(data);
-                    console.log('aaa');
-                    location.href = '/sale_list';
-                    //$('#result').html(data);
-                },
-                "json"
+                    alert(data);
+                    var list = jQuery.parseJSON(data);
+                    console.log(list);
+                    var doc = ""
+
+                    //$('#result').html('aaaaaa');
+                    //alert(data);
+                }
             );
-            //$.ajax({
-                //type: 'post',
-                //url: '/sale',
-                //async: false,
-                //data: JSON.stringify(msg),
-                //contentType: "application/json; charset=utf-8",
-                //dataType: "json",
-                //success: function(data){
-                    //location.href = '/sale_list';
-                //}
-            //})
         }
     </script>
 {% endblock %}
@@ -95,6 +77,14 @@
         </table>
         </form>
     <button class="btn btn-primary" type="button" onclick="sale();">销售</button>
-    <div id="result">result</div>
+        <hr>
+    <div id="result">
+        <h3>销售单</h3>
+    <div>单号：</div>
+<div>销售员：</div>
+<div>时间：</div>
+        <table class="table"><tr><th>编号</th><th>名称</th><th>单价</th><th>数量</th><th>金额</th></tr></table>
+
+    </div>
     </div>
 {% endblock %}

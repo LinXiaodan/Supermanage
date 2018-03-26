@@ -23,7 +23,7 @@ class Buy(models.Model):
     buy_month = models.IntegerField()
     buy_day = models.IntegerField()
     goods_id = models.CharField(max_length=10)   # 商品编号
-    good_quantity = models.IntegerField()   # 商品数量
+    goods_quantity = models.IntegerField()   # 商品数量
 
 
 # 库存商品表
@@ -41,3 +41,11 @@ class Stock(models.Model):
 # 商品种类表
 class GoodsType(models.Model):
     goods_type = models.CharField(max_length=10)
+
+
+class Sale(models.Model):
+    sale_id = models.CharField(max_length=20)
+    time = models.CharField(max_length=20)
+    goods_id = models.CharField(max_length=10)
+    goods_quantity = models.IntegerField()
+    username = models.CharField(max_length=10)

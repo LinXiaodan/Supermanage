@@ -25,6 +25,21 @@
                 $(this).parent().parent().remove();
             });
         }
+        function formatDateTime(inputTime) {    //timestamp -> strip time
+            var date = new Date(inputTime);
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? ('0' + m) : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            var h = date.getHours();
+            h = h < 10 ? ('0' + h) : h;
+            var minute = date.getMinutes();
+            var second = date.getSeconds();
+            minute = minute < 10 ? ('0' + minute) : minute;
+            second = second < 10 ? ('0' + second) : second;
+            return y + '-' + m + '-' + d+' '+h+':'+minute+':'+second;
+        }
 
         function sale() {   //提交销售信息
             var msg = {};
@@ -39,13 +54,31 @@
                 '/sale',
                 JSON.stringify(msg),
                 function(data){
-                    alert(data);
-                    var list = jQuery.parseJSON(data);
-                    console.log(list);
-                    var doc = ""
-
-                    //$('#result').html('aaaaaa');
-                    //alert(data);
+                    var sale_list = jQuery.parseJSON(data);
+                    // 打印销售单
+                    var result = $("<div class='panel panel-default'> <div class='panel-heading'> <h2 class='panel-title'>销售单 </h2></div> </div>");
+                    var body = $("<div class='panel-body'></div>");
+                    body.append("<div>单号：" + sale_list['sale_id'] + "</div>");
+                    body.append("<div>销售员：" + sale_list['username'] + "</div>");
+                    body.append("<div>时间：" + formatDateTime(parseInt(sale_list['time'])*1000) + "</div>");
+                    var table = $("<table class='table'><tr><th>编号</th><th>名称</th><th>单价</th><th>数量</th><th>金额</th></tr></table>");
+                    var list = sale_list['list'];
+                    $.each(list,function(name,value) {
+                        var row = $("<tr></tr>");
+                        row.append("<td>" + value['goods_id'] + "</td>");
+                        row.append("<td>" + value['goods_name'] + "</td>");
+                        row.append("<td>" + value['price'] + "</td>");
+                        row.append("<td>" + value['goods_quantity'] + "</td>");
+                        row.append("<td>" + value['tot_price'] + "</td>");
+                        table.append(row);
+                    });
+                    body.append(table);
+                    body.append("<div>" + sale_list['total'] + "</div>");
+                    result.append(body);
+                    $("input").each(function () {   //清空输入的内容
+                        $(this).val("");
+                    });
+                    $("#result").html(result);
                 }
             );
         }
@@ -78,13 +111,7 @@
         </form>
     <button class="btn btn-primary" type="button" onclick="sale();">销售</button>
         <hr>
-    <div id="result">
-        <h3>销售单</h3>
-    <div>单号：</div>
-<div>销售员：</div>
-<div>时间：</div>
-        <table class="table"><tr><th>编号</th><th>名称</th><th>单价</th><th>数量</th><th>金额</th></tr></table>
+        <div id="result"></div>
 
-    </div>
     </div>
 {% endblock %}

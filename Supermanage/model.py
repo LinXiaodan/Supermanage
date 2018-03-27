@@ -69,11 +69,12 @@ def reduce_stock(reduce_set, username, now_time, user_level):
         销售-减少库存，添加销售库记录
         返回: {
             'status': 'success'/'fail',
-            0:{id, quantity, price, tot_price},
-            1:.....
+            'list': {0:{id, name, quantity, price, tot_price},
+                    1:.....}
             'total': 总额,
             'sale_id': 销售单号,
-            'time': now_time
+            'time': now_time,
+            'username': 用户名
         }
     """
     sale_id = now_time + user_level    # 销售单号：时间戳+用户等级
@@ -84,25 +85,29 @@ def reduce_stock(reduce_set, username, now_time, user_level):
     }
 
     try:
+        sale_list = {}
         for key in reduce_set:
             goods_id = reduce_set[key]['id']
             goods_quantity = int(reduce_set[key]['quantity'])
             stock_object = Stock.objects.get(goods_id=goods_id)
             db_quantity = stock_object.quantity     # 库存数量
             Stock.objects.filter(goods_id=goods_id).update(quantity=db_quantity-goods_quantity)  # 减少库存
-            return_set.update({     # 商品金额
+            sale_list.update({     # 商品金额
                 key: {'goods_id': goods_id,
+                      'goods_name': stock_object.goods_name,
                       'goods_quantity': goods_quantity,
                       'price': stock_object.price,
-                      'tot_price': stock_object.price*goods_quantity}
+                      'tot_price': round(stock_object.price*goods_quantity, 2)}
             })
-            total += stock_object.price*goods_quantity  # 计算总额
+            total += round(stock_object.price*goods_quantity, 2)  # 计算总额
             sale = Sale(sale_id=sale_id, time=now_time, goods_id=goods_id,
                         goods_quantity=goods_quantity, username=username)
             sale.save()
         return_set.update({
             'status': 'success',
-            'total': total
+            'total': total,
+            'list': sale_list,
+            'username': username,
         })
         return return_set
     except Exception as e:

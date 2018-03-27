@@ -54,6 +54,17 @@ def stock(request):
             context.update({
                 'show_list': show_list
             })
+        else:
+            context.update({
+                'info_list': ['编号', '种类', '名称', '单位', '库存量', '售价（元）', '最低库存']
+            })
+            show_list = []
+            for var in stock_list:
+                show_list.append([var.goods_id, var.goods_type, var.goods_name, var.unit, var.quantity,
+                                  var.price, var.lowest_quantity])
+            context.update({
+                'show_list': show_list
+            })
         return render(request, 'stock.html', context)
     else:
         return redirect('/login')
@@ -151,3 +162,41 @@ def sale_list(request):
     list_info = json.loads(request.COOKIES.get('list_info'))
     print list_info
     return HttpResponse('销售')
+
+
+# 添加用户
+def add_user(request):
+    if request.COOKIES.get('user_level') is None:
+        return redirect('/login')
+    if int(request.COOKIES.get('user_level')) is not 0:     # 非管理员
+        return redirect('/stock')
+
+    username = request.COOKIES.get('username')
+    ctx = {
+        'username': username
+    }
+
+    if request.method == 'GET':
+        return render(request, 'add_user.html', ctx)
+    else:
+        user_level_val = request.POST.get('user_level')
+        if user_level_val == 'admin':
+            add_user_level = 0
+        else:
+            add_user_level = 1
+        add_username = request.POST.get('username')
+        add_password = request.POST.get('password')
+        res = addUser(add_user_level, add_username, add_password)
+        if res == 1:
+            ctx.update({
+                'msg': '添加用户成功！'
+            })
+        elif res == 0:
+            ctx.update({
+                'msg': '添加用户失败！'
+            })
+        else:
+            ctx.update({
+                'msg': '用户名重复！'
+            })
+        return render(request, 'add_user.html', ctx)

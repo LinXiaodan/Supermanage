@@ -110,7 +110,20 @@ def reduce_stock(reduce_set, username, now_time, user_level):
             'username': username,
         })
         return return_set
-    except Exception as e:
+    except:
         return {
             'status': 'fail'
         }
+
+
+# 添加用户信息， 加到用户信息表中, 返回：1-成功，0-失败, 2-名字重复
+def addUser(user_level, username, password):
+    res = User.objects.filter(username=username).first()
+    if res:
+        return 2
+    try:
+        user_add = User(user_level=user_level, username=username, password=password)
+        user_add.save()
+        return 1
+    except:
+        return 0

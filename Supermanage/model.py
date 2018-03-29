@@ -64,7 +64,7 @@ def getStock():
     return goods_list
 
 
-def reduce_stock(reduce_set, username, now_time, user_level):
+def reduce_stock_sale(reduce_set, username, now_time, user_level):
     """
         销售-减少库存，添加销售库记录
         返回: {
@@ -107,6 +107,110 @@ def reduce_stock(reduce_set, username, now_time, user_level):
             'status': 'success',
             'total': total,
             'list': sale_list,
+            'username': username,
+        })
+        return return_set
+    except:
+        return {
+            'status': 'fail'
+        }
+
+
+def reduce_stock_return(reduce_set, username, now_time, user_level):
+    """
+        退货-减少库存，添加退货库记录
+        返回: {
+            'status': 'success'/'fail',
+            'list': {0:{id, name, quantity, buying_price, tot_price},
+                    1:.....}
+            'total': 总额,
+            'return_id': 退货单号,
+            'time': now_time,
+            'username': 用户名
+        }
+    """
+    return_id = now_time + user_level  # 销售单号：时间戳+用户等级
+    total = 0
+    return_set = {
+        'return_id': return_id,
+        'time': now_time
+    }
+
+    try:
+        return_list = {}
+        for key in reduce_set:
+            goods_id = reduce_set[key]['id']
+            goods_quantity = int(reduce_set[key]['quantity'])
+            stock_object = Stock.objects.get(goods_id=goods_id)
+            db_quantity = stock_object.quantity  # 库存数量
+            Stock.objects.filter(goods_id=goods_id).update(quantity=db_quantity - goods_quantity)  # 减少库存
+            return_list.update({  # 商品金额
+                key: {'goods_id': goods_id,
+                      'goods_name': stock_object.goods_name,
+                      'goods_quantity': goods_quantity,
+                      'buying_price': stock_object.price,
+                      'tot_price': round(stock_object.price * goods_quantity, 2)}
+            })
+            total += round(stock_object.buying_price * goods_quantity, 2)  # 计算总额
+            return_goods = ReturnGoods(return_id=return_id, time=now_time, goods_id=goods_id,
+                                       goods_quantity=goods_quantity, username=username)
+            return_goods.save()
+        return_set.update({
+            'status': 'success',
+            'total': total,
+            'list': return_list,
+            'username': username,
+        })
+        return return_set
+    except:
+        return {
+            'status': 'fail'
+        }
+
+
+def add_stock_buy(add_set, username, now_time, user_level):
+    """
+        进货-减少库存，添加进货库记录
+        返回: {
+            'status': 'success'/'fail',
+            'list': {0:{id, name, quantity, buying_price, tot_price},
+                    1:.....}
+            'total': 总额,
+            'buy_id': 进货单号,
+            'time': now_time,
+            'username': 用户名
+        }
+    """
+    buy_id = now_time + user_level  # 销售单号：时间戳+用户等级
+    total = 0
+    return_set = {
+        'buy_id': buy_id,
+        'time': now_time
+    }
+
+    try:
+        return_list = {}
+        for key in add_set:
+            goods_id = add_set[key]['id']
+            goods_quantity = int(add_set[key]['quantity'])
+            stock_object = Stock.objects.get(goods_id=goods_id)
+            db_quantity = stock_object.quantity  # 库存数量
+            Stock.objects.filter(goods_id=goods_id).update(quantity=db_quantity + goods_quantity)  # 增加库存
+            return_list.update({  # 商品金额
+                key: {'goods_id': goods_id,
+                      'goods_name': stock_object.goods_name,
+                      'goods_quantity': goods_quantity,
+                      'buying_price': stock_object.price,
+                      'tot_price': round(stock_object.price * goods_quantity, 2)}
+            })
+            total += round(stock_object.buying_price * goods_quantity, 2)  # 计算总额
+            buy = Buying(buy_id=buy_id, time=now_time, goods_id=goods_id,
+                         goods_quantity=goods_quantity, username=username)
+            buy.save()
+        return_set.update({
+            'status': 'success',
+            'total': total,
+            'list': return_list,
             'username': username,
         })
         return return_set

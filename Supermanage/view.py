@@ -149,10 +149,58 @@ def sale(request):
         return render(request, 'sale.html', ctx)
     else:
         now_time = str(int(time.time()))
-        sale_result = reduce_stock(json.loads(request.body), username, now_time, request.COOKIES.get('user_level'))
-        print sale_result
+        sale_result = reduce_stock_sale(json.loads(request.body), username, now_time, request.COOKIES.get('user_level'))
+
         if sale_result.get('status') == 'success':
             return HttpResponse(json.dumps(sale_result))
+        else:
+            return HttpResponse('失败，请重试！')
+
+
+# 退货
+def return_goods(request):
+    if request.COOKIES.get('user_level') is None:   # 未登录
+        return redirect('/login')
+    if int(request.COOKIES.get('user_level')) is not 0:     # 非管理员
+        return redirect('/stock')
+
+    username = request.COOKIES.get('username')
+    ctx = {
+        'username': username
+    }
+
+    if request.method == 'GET':
+        return render(request, 'return_goods.html', ctx)
+    else:
+        now_time = str(int(time.time()))
+        return_result = reduce_stock_return(json.loads(request.body), username, now_time, request.COOKIES.get('user_level'))
+
+        if return_result.get('status') == 'success':
+            return HttpResponse(json.dumps(return_result))
+        else:
+            return HttpResponse('失败，请重试！')
+
+
+# 进货
+def buy(request):
+    if request.COOKIES.get('user_level') is None:  # 未登录
+        return redirect('/login')
+    if int(request.COOKIES.get('user_level')) is not 0:  # 非管理员
+        return redirect('/stock')
+
+    username = request.COOKIES.get('username')
+    ctx = {
+        'username': username
+    }
+
+    if request.method == 'GET':
+        return render(request, 'buy.html', ctx)
+    else:
+        now_time = str(int(time.time()))
+        return_result = add_stock_buy(json.loads(request.body), username, now_time, request.COOKIES.get('user_level'))
+
+        if return_result.get('status') == 'success':
+            return HttpResponse(json.dumps(return_result))
         else:
             return HttpResponse('失败，请重试！')
 

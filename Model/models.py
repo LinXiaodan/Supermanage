@@ -16,16 +16,6 @@ class User(models.Model):
     password = models.CharField(max_length=100)
 
 
-# 进货表
-class Buy(models.Model):
-    buy_id = models.IntegerField()  # 进货编号
-    buy_year = models.IntegerField()
-    buy_month = models.IntegerField()
-    buy_day = models.IntegerField()
-    goods_id = models.CharField(max_length=10)   # 商品编号
-    goods_quantity = models.IntegerField()   # 商品数量
-
-
 # 库存商品表
 class Stock(models.Model):
     goods_id = models.CharField(max_length=10)  # 商品编号
@@ -43,9 +33,29 @@ class GoodsType(models.Model):
     goods_type = models.CharField(max_length=10)
 
 
+# 销售表
 class Sale(models.Model):
     sale_id = models.CharField(max_length=20)
     time = models.CharField(max_length=20)
     goods_id = models.CharField(max_length=10)
     goods_quantity = models.IntegerField()
     username = models.CharField(max_length=10)
+
+
+# 退货表
+class ReturnGoods(models.Model):
+    return_id = models.CharField(max_length=20)
+    time = models.CharField(max_length=20)
+    goods_id = models.CharField(max_length=10)
+    goods_quantity = models.IntegerField()
+    username = models.CharField(max_length=10)
+
+
+# 进货表
+class Buying(models.Model):
+    buy_id = models.CharField(max_length=20)
+    time = models.CharField(max_length=20)
+    goods_id = models.CharField(max_length=10)
+    goods_quantity = models.IntegerField()
+    username = models.CharField(max_length=10)
+
